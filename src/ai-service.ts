@@ -1,7 +1,8 @@
+import { z } from "zod";
 import { ai } from "./gemini.js";
 import { config } from "./config.js";
 import { calculatorTool } from "./tools/calculator-tool.js";
-import { travelSchema } from "./schemas/travel-schema.js";
+import { TravelSchema } from "./schemas/travel-schema.js";
 
 export async function askQuestion(userInput: string) {
   const stream = await ai.interactions.create({
@@ -16,19 +17,24 @@ export async function askQuestion(userInput: string) {
 }
 
 export async function generateTravelPlan(userInput: string) {
-  const stream = await askQuestion(userInput);
+  const response = await ai.interactions.create({
+    model: config.model,
+    input: userInput,
+    // responseMimeType: "application/json",
+    response_format: {
+      type: "text",
+      mime_type: "application/json",
+      schema: z.toJSONSchema(TravelSchema),
+    },
+  });
 
-  // Wait until the full answer arrives from the stream.
-  let fullResponse = "";
+  const responseText = response.output_text;
 
-  for await (const event of stream) {
-    if (event.event_type === "step.delta" && event.delta?.type === "text") {
-      fullResponse += event.delta.text;
-    }
+  if (typeof responseText !== "string") {
+    throw new Error("The AI return invalid response");
   }
-
-  const parsed = JSON.parse(fullResponse);
-  const result = travelSchema.safeParse(parsed);
+  const parsed = JSON.parse(responseText);
+  const result = TravelSchema.safeParse(parsed);
 
   if (!result.success) {
     throw new Error("The AI returned invalid data");

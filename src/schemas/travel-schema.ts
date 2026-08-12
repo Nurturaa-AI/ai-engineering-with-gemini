@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const travelSchema = z.object({
+export const TravelSchema = z.object({
   destination: z.string().min(1),
   country: z.string().min(1),
   durationDays: z.number().int().positive(),
@@ -8,4 +8,4 @@ export const travelSchema = z.object({
   activities: z.array(z.string()),
 });
 
-export type TravelPlan = z.infer<typeof travelSchema>;
+export type TravelPlan = z.infer<typeof TravelSchema>;
