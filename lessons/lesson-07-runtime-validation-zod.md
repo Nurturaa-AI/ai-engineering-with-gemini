@@ -2,7 +2,7 @@ Lesson 7 — Zod as the Source of Truth
 
 1. The problem with duplicate schemas
 
-Previously, we defined the travel structure twice.
+Previously, i defined the travel structure twice.
 
 Zod schema
 const TravelSchema = z.object({
@@ -33,7 +33,7 @@ If one changes and the other doesn't, they can drift apart.
 
 2. Zod becomes the source of truth
 
-We decided that TravelSchema should be our single source of truth.
+i decided that TravelSchema should be our single source of truth.
 
 const TravelSchema = z.object({
 destination: z.string(),
@@ -43,7 +43,7 @@ estimatedBudget: z.number(),
 activities: z.array(z.string()),
 });
 
-From this one schema, we can perform several jobs.
+From this one schema, i can perform several jobs.
 
 3. Generate Gemini's JSON Schema
 
@@ -56,7 +56,7 @@ properties: {
 }
 }
 
-we use:
+i use:
 
 schema: z.toJSONSchema(TravelSchema)
 
@@ -70,7 +70,7 @@ z.toJSONSchema()
 ↓
 Gemini JSON Schema 4. Generate the TypeScript type
 
-We don't need to manually create:
+i do not need to manually create:
 
 interface TravelPlan {
 destination: string;
@@ -90,7 +90,7 @@ If the schema changes, the TypeScript type changes with it.
 
 5. Validate Gemini's response
 
-Even though Gemini was given the schema, we still validate the actual response:
+Even though Gemini was given the schema, i still validate the actual response:
 
 const result = TravelSchema.safeParse(parsed);
 
@@ -100,11 +100,11 @@ throw new Error("The AI returned invalid travel data");
 
 return result.data;
 
-This is important because telling Gemini what format to return is not the same as validating the data your application receives.
+This is important because telling Gemini what format to return is not the same as validating the data the application receives.
 
 6. The complete flow
 
-Your application now works like this:
+The application now works like this:
 
                     TravelSchema
                          │
@@ -140,7 +140,7 @@ z.toJSONSchema() Converts Zod schema to JSON Schema
 safeParse() Validates runtime data without throwing
 JSON.parse() Converts JSON text into JavaScript data 8. What we actually built
 
-We tested:
+i tested:
 
 npx tsx src/test-travel.ts
 
